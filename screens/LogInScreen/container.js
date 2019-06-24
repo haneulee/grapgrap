@@ -38,6 +38,7 @@ class Container extends Component {
         this.setState({
           isSubmitting: true
         });
+        this.props.login(username, password);
       } else {
         Alert.alert("all fields are required.");
       }

@@ -35,15 +35,18 @@ const TabsNavigation = createBottomTabNavigator(
     },
     AddPhoto: {
       screen: View,
-      navigationOptions: {
+      navigationOptions: ({ navigation }) => ({
         tabBarIcon: ({ focused }) => (
-          <Feather
-            name={"camera"}
+          <AntDesign
+            name={"plussquareo"}
             size={25}
             color={focused ? "black" : "lightgrey"}
           />
-        )
-      }
+        ),
+        tabBarOnPress: () => {
+          navigation.navigate("TakePhoto");
+        }
+      })
     },
     Notifications: {
       screen: NotificationsRoute,

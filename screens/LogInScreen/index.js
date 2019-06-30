@@ -6,7 +6,10 @@ import { actionCreators as userActions } from "../../redux/modules/user";
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     login: (username, password) => {
-      dispatch(userActions.usernameLogin(username, password));
+      return dispatch(userActions.usernameLogin(username, password));
+    },
+    fbLogin: () => {
+      return dispatch(userActions.facebookLogin());
     }
   };
 };

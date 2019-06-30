@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { View, Text, StatusBar, StyleSheet } from "react-native";
+import { View, Text, StatusBar, StyleSheet, Button } from "react-native";
 import LoggedOutNavigation from "../../navigation/LoggedOutNavigation";
 
 class AppContainer extends React.Component {
@@ -9,11 +9,18 @@ class AppContainer extends React.Component {
   };
 
   render() {
-    const { isLoggedIn } = this.props;
+    const { isLoggedIn, logout } = this.props;
     return (
       <View style={styles.container}>
         <StatusBar hidden={false} />
-        {isLoggedIn ? <Text>you are logged in</Text> : <LoggedOutNavigation />}
+        {isLoggedIn ? (
+          <View>
+            <Text>you are logged in</Text>
+            <Button onPress={logout} title="you are logged in" />
+          </View>
+        ) : (
+          <LoggedOutNavigation />
+        )}
       </View>
     );
   }

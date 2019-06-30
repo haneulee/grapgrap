@@ -1,5 +1,6 @@
 import AppContainer from "./presenter";
 import { connect } from "react-redux";
+import { actionCreators as userActions } from "../../redux/modules/user";
 
 const mapStateToProps = (state, ownProps) => {
   const { user } = state;
@@ -9,4 +10,16 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps)(AppContainer);
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    logout: () => {
+      console.log("mapDispatchToProps");
+      return dispatch(userActions.logout());
+    }
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AppContainer);

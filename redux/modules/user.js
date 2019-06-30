@@ -1,11 +1,12 @@
 //imports
-import { API_URL } from "../../constants";
+import { API_URL, FB_APP_ID } from "../../constants";
 import { AsyncStorage } from "react-native";
+import * as Facebook from "expo-facebook";
 
 //actions
 
-const LOGIN = "LOGIN";
-const LOGOUT = "LOGOUT";
+const LOGIN = "LOG_IN";
+const LOGOUT = "LOG_OUT";
 const SET_USER = "SET_USER";
 
 //action creators
@@ -47,14 +48,49 @@ function usernameLogin(username, password) {
       .then(response => response.json())
       .then(json => {
         console.log(json);
-        if (json.token) {
+        if (json.token && json.user) {
           dispatch(login(json.token));
-        }
-        if (json.user) {
           dispatch(setUser(json.user));
+          return true;
+        } else {
+          return false;
         }
       })
       .catch(err => console.log(err));
+  };
+}
+
+function facebookLogin() {
+  return async dispatch => {
+    const { type, token } = await Facebook.logInWithReadPermissionsAsync(
+      FB_APP_ID,
+      {
+        permissions: ["public_profile", "email"]
+      }
+    );
+
+    if (type === "success") {
+      return fetch(`${API_URL}/users/login/facebook/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          access_token: token
+        })
+      })
+        .then(response => response.json())
+        .then(json => {
+          console.log(json);
+          if (json.user && json.token) {
+            dispatch(login(json.token));
+            dispatch(setUser(json.user));
+            return true;
+          } else {
+            return false;
+          }
+        });
+    }
   };
 }
 
@@ -91,9 +127,13 @@ function applyLogin(state, action) {
 }
 
 function applyLogout(state, action) {
-  AsyncStorage.clear();
+  //  AsyncStorage.clear();
+  console.log("logout~~~~~");
   return {
-    isLoggedIn: false
+    ...state,
+    isLoggedIn: false,
+    token: "",
+    profile: []
   };
 }
 
@@ -108,7 +148,9 @@ function applySetUser(state, action) {
 //exports
 
 const actionCreators = {
-  usernameLogin
+  usernameLogin,
+  facebookLogin,
+  logout
 };
 
 export { actionCreators };

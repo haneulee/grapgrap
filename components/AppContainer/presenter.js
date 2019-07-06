@@ -10,16 +10,12 @@ class AppContainer extends React.Component {
   };
 
   render() {
-    const { isLoggedIn, logout } = this.props;
+    const { isLoggedIn, logout, profile } = this.props;
     return (
       <View style={styles.container}>
         <StatusBar hidden={false} />
         {isLoggedIn ? (
-          //   <View>
-          //     <Text>you are logged in</Text>
-          //     <Button onPress={logout} title="you are logged in" />
-          //   </View>
-          <RootNavigation />
+          <RootNavigation screenProps={{ username: profile.username }} />
         ) : (
           <LoggedOutNavigation />
         )}
@@ -32,8 +28,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff"
-    // alignItems: "center", //navigation 상위 view에 해당 스타일이 있으면 보여지지 않음
-    // justifyContent: "center"
   }
 });
 

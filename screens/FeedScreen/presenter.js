@@ -7,6 +7,7 @@ import {
   RefreshControl,
   StyleSheet
 } from "react-native";
+import Photo from "../../components/Photo";
 
 const FeedScreen = props => (
   <ScrollView
@@ -17,8 +18,12 @@ const FeedScreen = props => (
         tintColor={"black"}
       />
     }
-    contentContainerStyle={styles.container}
-  />
+  >
+    <View style={styles.container}>
+      {props.feed &&
+        props.feed.map(photo => <Photo {...photo} key={photo.id} />)}
+    </View>
+  </ScrollView>
 );
 
 const styles = StyleSheet.create({

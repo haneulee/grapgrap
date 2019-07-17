@@ -69,6 +69,25 @@ function getSearch() {
   };
 }
 
+function searchByHashtag(hashtag) {
+  return (dispatch, getState) => {
+    const { user: { token } } = getState();
+    fetch(`${API_URL}/images/search/?hashtags=${hashtag}`, {
+      headers: {
+        Authorization: `JWT ${token}`
+      }
+    })
+      .then(response => {
+        if (response.status === 401) {
+          dispatch(userActions.logout());
+        } else {
+          return response.json();
+        }
+      })
+      .then(json => dispatch(setSearch(json)));
+  };
+}
+
 //initial state
 
 const initialState = {};
@@ -108,7 +127,8 @@ function applySetSearch(state, action) {
 
 const actionCreators = {
   getFeed,
-  getSearch
+  getSearch,
+  searchByHashtag
 };
 
 export { actionCreators };

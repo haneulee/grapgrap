@@ -7,7 +7,7 @@ import RootNavigation from "../../navigation/RootNavigation";
 class AppContainer extends React.Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
-    profile: PropTypes.object.isRequired,
+    profile: PropTypes.object,
     initApp: PropTypes.func.isRequired
   };
 

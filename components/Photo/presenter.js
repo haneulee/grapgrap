@@ -3,17 +3,15 @@ import PropTypes from "prop-types";
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
-  StyleSheet,
-  Dimensions
+  Image,
+  Dimensions,
+  StyleSheet
 } from "react-native";
 import FadeIn from "react-native-fade-in-image";
 import PhotoActions from "../PhotoActions";
 import { withNavigation } from "react-navigation";
-
 const { width, height } = Dimensions.get("window");
-
 const Photo = props => (
   <View style={styles.photo}>
     <TouchableOpacity>
@@ -22,34 +20,34 @@ const Photo = props => (
           <Image
             source={
               props.creator.profile_image
-                ? { uri: props.creator.profile_image }
+                ? {
+                    uri: props.creator.profile_image
+                  }
                 : require("../../assets/images/noPhoto.jpg")
             }
             style={styles.avatar}
           />
         </FadeIn>
         <View>
-          <View>
-            <Text style={styles.author}>{props.creator.username}</Text>
-            {props.location && (
-              <Text style={styles.location}>{props.location}</Text>
-            )}
-          </View>
+          <Text style={styles.author}>{props.creator.username}</Text>
+          {props.location && (
+            <Text style={styles.location}>{props.location}</Text>
+          )}
         </View>
       </View>
     </TouchableOpacity>
     <FadeIn>
       <Image
+        source={{ uri: props.file }}
         style={{ width, height: props.is_vertical ? 600 : 300 }}
-        source={
-          props.file
-            ? { uri: props.file }
-            : require("../../assets/images/noPhoto.jpg")
-        }
       />
     </FadeIn>
-    <PhotoActions likeCount={props.like_count} isLiked={props.is_liked} />
     <View style={styles.photoMeta}>
+      <PhotoActions
+        isLiked={props.isLiked}
+        likeCount={props.likeCount}
+        handlePress={props.handlePress}
+      />
       <View style={styles.comment}>
         <Text style={styles.commentAuthor}>
           {props.creator.username}{" "}
@@ -57,56 +55,24 @@ const Photo = props => (
         </Text>
       </View>
       {props.comments.length > 0 && (
-        <View style={styles.comment}>
-          <TouchableOpacity>
-            <View style={styles.commentsLink}>
-              {props.comments.length === 1 ? (
-                <Text style={styles.linkText}>View 1 comment</Text>
-              ) : (
-                <Text style={styles.linkText}>
-                  View all {props.comments.length} comments
-                </Text>
-              )}
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPressOut={() => props.navigation.navigate("Comments")}
+        >
+          <View style={styles.commentsLink}>
+            {props.comments.length === 1 ? (
+              <Text style={styles.linkText}>View 1 comment</Text>
+            ) : (
+              <Text style={styles.linkText}>
+                View all {props.comments.length} comments
+              </Text>
+            )}
+          </View>
+        </TouchableOpacity>
       )}
-      <Text>{props.natural_time}</Text>
+      <Text style={styles.dateText}>{props.natural_time.toUpperCase()}</Text>
     </View>
   </View>
 );
-
-Photo.propTypes = {
-  caption: PropTypes.string.isRequired,
-  id: PropTypes.number.isRequired,
-  like_count: PropTypes.number.isRequired,
-  location: PropTypes.string.isRequired,
-  file: PropTypes.string.isRequired,
-  natural_time: PropTypes.string,
-  creator: PropTypes.shape({
-    profile_image: PropTypes.string,
-    image: PropTypes.string
-  }),
-  comments: PropTypes.arrayOf(
-    PropTypes.shape({
-      creator: PropTypes.shape({
-        profile_image: PropTypes.string,
-        image: PropTypes.string
-      }).isRequired,
-      message: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  is_liked: PropTypes.bool.isRequired,
-  is_vertical: PropTypes.bool.isRequired,
-  likes: PropTypes.arrayOf(
-    PropTypes.shape({
-      profile_image: PropTypes.string,
-      username: PropTypes.string.isRequired,
-      name: PropTypes.string
-    }).isRequired
-  )
-};
-
 const styles = StyleSheet.create({
   photo: {
     width,
@@ -139,7 +105,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   comment: {
-    marginTop: 10
+    marginTop: 5
   },
   commentAuthor: {
     marginRight: 5,
@@ -160,8 +126,33 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 12,
     color: "#999",
-    marginTop: 5
+    marginTop: 10
   }
 });
+Photo.propTypes = {
+  id: PropTypes.number.isRequired,
+  creator: PropTypes.shape({
+    profile_image: PropTypes.string,
+    username: PropTypes.string.isRequired
+  }).isRequired,
+  location: PropTypes.string.isRequired,
+  file: PropTypes.string.isRequired,
+  like_count: PropTypes.number.isRequired,
+  caption: PropTypes.string.isRequired,
+  comments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      message: PropTypes.string.isRequired,
+      creator: PropTypes.shape({
+        profile_image: PropTypes.string,
+        username: PropTypes.string.isRequired
+      }).isRequired
+    })
+  ).isRequired,
+  natural_time: PropTypes.string.isRequired,
+  is_liked: PropTypes.bool.isRequired,
+  is_vertical: PropTypes.bool.isRequired,
+  handlePress: PropTypes.func.isRequired
+};
 
 export default withNavigation(Photo);

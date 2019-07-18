@@ -16,10 +16,10 @@ function setFeed(feed) {
   };
 }
 
-function setSearch(feed) {
+function setSearch(search) {
   return {
     type: SET_SEARCH,
-    feed
+    search
   };
 }
 

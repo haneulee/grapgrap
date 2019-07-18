@@ -14,7 +14,7 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 const PhotoActions = props => (
   <View style={styles.container}>
     <View style={styles.actions}>
-      <TouchableOpacity>
+      <TouchableOpacity onPressOut={props.handlePress}>
         <View style={styles.action}>
           <Ionicons
             name={props.isLiked ? "md-heart" : "md-heart-empty"}

@@ -71,7 +71,9 @@ function getSearch() {
 
 function searchByHashtag(hashtag) {
   return (dispatch, getState) => {
-    const { user: { token } } = getState();
+    const {
+      user: { token }
+    } = getState();
     fetch(`${API_URL}/images/search/?hashtags=${hashtag}`, {
       headers: {
         Authorization: `JWT ${token}`
@@ -85,6 +87,50 @@ function searchByHashtag(hashtag) {
         }
       })
       .then(json => dispatch(setSearch(json)));
+  };
+}
+
+function likePhoto(id) {
+  return (dispatch, getState) => {
+    const {
+      user: { token }
+    } = getState();
+    fetch(`${API_URL}/images/${id}/likes/`, {
+      method: "POST",
+      headers: {
+        Authorization: `JWT ${token}`
+      }
+    }).then(response => {
+      if (response.status === 401) {
+        dispatch(userActions.logout());
+      } else if (response.ok) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  };
+}
+
+function unlikePhoto(id) {
+  return (dispatch, getState) => {
+    const {
+      user: { token }
+    } = getState();
+    fetch(`${API_URL}/images/${id}/unlikes/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `JWT ${token}`
+      }
+    }).then(response => {
+      if (response.status === 401) {
+        dispatch(userActions.logout());
+      } else if (response.ok) {
+        return true;
+      } else {
+        return false;
+      }
+    });
   };
 }
 
@@ -128,7 +174,9 @@ function applySetSearch(state, action) {
 const actionCreators = {
   getFeed,
   getSearch,
-  searchByHashtag
+  searchByHashtag,
+  likePhoto,
+  unlikePhoto
 };
 
 export { actionCreators };

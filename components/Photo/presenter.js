@@ -11,7 +11,9 @@ import {
 import FadeIn from "react-native-fade-in-image";
 import PhotoActions from "../PhotoActions";
 import { withNavigation } from "react-navigation";
+
 const { width, height } = Dimensions.get("window");
+
 const Photo = props => (
   <View style={styles.photo}>
     <TouchableOpacity>
@@ -73,6 +75,7 @@ const Photo = props => (
     </View>
   </View>
 );
+
 const styles = StyleSheet.create({
   photo: {
     width,
@@ -129,6 +132,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   }
 });
+
 Photo.propTypes = {
   id: PropTypes.number.isRequired,
   creator: PropTypes.shape({

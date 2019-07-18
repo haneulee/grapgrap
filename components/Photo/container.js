@@ -1,3 +1,5 @@
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 import Photo from "./presenter";
 
 class Container extends Component {
@@ -16,7 +18,7 @@ class Container extends Component {
       <Photo handlePress={this._handlePress} {...this.props} {...this.state} />
     );
   }
-  _handlePress() {
+  _handlePress = () => {
     const { dispatchLike } = this.props;
     const { isLiked } = this.state;
     dispatchLike(isLiked);
@@ -35,7 +37,7 @@ class Container extends Component {
         };
       });
     }
-  }
+  };
 }
 
 export default Container;

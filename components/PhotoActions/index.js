@@ -43,8 +43,7 @@ const PhotoActions = props => (
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 5,
-    paddingHorizontal: 15
+    marginTop: 5
   },
   actions: {
     flexDirection: "row"

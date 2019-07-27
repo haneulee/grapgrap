@@ -76,7 +76,8 @@ function searchByHashtag(hashtag) {
     } = getState();
     fetch(`${API_URL}/images/search/?hashtags=${hashtag}`, {
       headers: {
-        Authorization: `JWT ${token}`
+        Authorization: `JWT ${token}`,
+        "Content-Type": "application/json"
       }
     })
       .then(response => {

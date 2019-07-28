@@ -1,6 +1,7 @@
 //imports
 import { API_URL } from "../../constants";
 import { actionCreators as userActions } from "./user";
+import uuidv1 from "uuid/v1";
 
 //actions
 
@@ -135,6 +136,42 @@ function unlikePhoto(id) {
   };
 }
 
+function uploadPhoto(file, caption, location, tags) {
+  const tagsArray = tags.split(",");
+  const data = new FormData();
+  data.append("caption", caption);
+  data.append("location", location);
+  data.append("tags", JSON.stringify(tagsArray));
+  data.append("file", {
+    uri: file,
+    type: "image/jpeg",
+    name: `${uuidv1()}.jpg`
+  });
+  return (dispatch, getState) => {
+    const {
+      user: { token }
+    } = getState();
+    return fetch(`${API_URL}/images/`, {
+      method: "POST",
+      headers: {
+        Authorization: `JWT ${token}`,
+        "Content-Type": "multipart/form-data"
+      },
+      body: data
+    }).then(response => {
+      if (response.status === 401) {
+        dispatch(userActions.logout());
+      } else if (response.ok) {
+        dispatch(getFeed());
+        dispatch(userActions.getOwnProfile());
+        return true;
+      } else {
+        return false;
+      }
+    });
+  };
+}
+
 //initial state
 
 const initialState = {};
@@ -177,7 +214,8 @@ const actionCreators = {
   getSearch,
   searchByHashtag,
   likePhoto,
-  unlikePhoto
+  unlikePhoto,
+  uploadPhoto
 };
 
 export { actionCreators };

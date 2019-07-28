@@ -10,6 +10,10 @@ class Container extends Component {
       headerTitle: <SearchBar submit={text => params.submitSearch(text)} />
     };
   };
+
+  static defaultProps = {
+    search: []
+  };
   static propTypes = {
     getEmptySearch: PropTypes.func.isRequired,
     searchHashtag: PropTypes.func.isRequired,

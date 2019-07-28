@@ -5,10 +5,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  CameraRoll
+  CameraRoll,
+  StatusBar
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Camera, Permissions } from "expo";
+// import { Camera, Permissions } from "expo";
+import { Camera } from "expo-camera";
+import * as Permissions from "expo-permissions";
+import FitImage from "react-native-fit-image";
 
 class CameraScreen extends Component {
   state = {
@@ -21,13 +25,24 @@ class CameraScreen extends Component {
 
   componentWillMount = async () => {
     const camera = await Permissions.askAsync(Permissions.CAMERA);
+    const cameraRoll = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
     this.setState({
-      hasCameraPermissions: camera.status === "granted"
+      hasCameraPermissions:
+        camera.status === "granted" && cameraRoll.status === "granted"
+          ? true
+          : false
     });
   };
 
   render() {
-    const { hasCameraPermissions, type, flash } = this.state;
+    const {
+      hasCameraPermissions,
+      type,
+      flash,
+      pictureTaken,
+      picture
+    } = this.state;
     if (hasCameraPermissions === null) {
       return <View />;
     } else if (hasCameraPermissions === false) {
@@ -35,43 +50,69 @@ class CameraScreen extends Component {
     } else {
       return (
         <View style={styles.container}>
-          <Camera
-            type={type}
-            flashMode={flash}
-            ref={camera => (this.camera = camera)}
-            style={styles.camera}
-          >
-            <TouchableOpacity onPressOut={this._changeType}>
-              <View style={styles.action}>
-                <MaterialIcons
-                  name={
-                    type === Camera.Constants.Type.back
-                      ? "camera-front"
-                      : "camera-rear"
-                  }
-                  color="white"
-                  size={40}
-                />
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPressOut={this._changeFlash}>
-              <View style={styles.action}>
-                {flash === Camera.Constants.FlashMode.off && (
-                  <MaterialIcons name={"flash-off"} color="white" size={40} />
-                )}
-                {flash === Camera.Constants.FlashMode.on && (
-                  <MaterialIcons name={"flash-on"} color="white" size={40} />
-                )}
-                {flash === Camera.Constants.FlashMode.auto && (
-                  <MaterialIcons name={"flash-auto"} color="white" size={40} />
-                )}
-              </View>
-            </TouchableOpacity>
-          </Camera>
+          <StatusBar hidden={true} />
+          {pictureTaken ? (
+            <View style={{ flex: 2 }}>
+              <FitImage source={{ uri: picture }} style={{ flex: 1 }} />
+            </View>
+          ) : (
+            <Camera
+              type={type}
+              flashMode={flash}
+              ref={camera => (this.camera = camera)}
+              style={styles.camera}
+            >
+              <TouchableOpacity onPressOut={this._changeType}>
+                <View style={styles.action}>
+                  <MaterialIcons
+                    name={
+                      type === Camera.Constants.Type.back
+                        ? "camera-front"
+                        : "camera-rear"
+                    }
+                    color="white"
+                    size={40}
+                  />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPressOut={this._changeFlash}>
+                <View style={styles.action}>
+                  {flash === Camera.Constants.FlashMode.off && (
+                    <MaterialIcons name={"flash-off"} color="white" size={40} />
+                  )}
+                  {flash === Camera.Constants.FlashMode.on && (
+                    <MaterialIcons name={"flash-on"} color="white" size={40} />
+                  )}
+                  {flash === Camera.Constants.FlashMode.auto && (
+                    <MaterialIcons
+                      name={"flash-auto"}
+                      color="white"
+                      size={40}
+                    />
+                  )}
+                </View>
+              </TouchableOpacity>
+            </Camera>
+          )}
           <View style={styles.btnContainer}>
-            <TouchableOpacity>
-              <View style={styles.btn} />
-            </TouchableOpacity>
+            {pictureTaken ? (
+              <View style={styles.photoActions}>
+                <TouchableOpacity onPressOut={this._rejectPhoto}>
+                  <MaterialIcons name={"cancel"} size={60} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity onPressOut={this._approvePhoto}>
+                  <MaterialIcons
+                    name={"check-circle"}
+                    size={60}
+                    color="black"
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity onPressOut={this._takePhoto}>
+                <View style={styles.btn} />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       );
@@ -95,6 +136,40 @@ class CameraScreen extends Component {
       } else if (prevState.flash === Camera.Constants.FlashMode.auto) {
         return { flash: Camera.Constants.FlashMode.off };
       }
+    });
+  };
+  _takePhoto = () => {
+    const { pictureTaken } = this.state;
+
+    if (!pictureTaken) {
+      if (this.camera) {
+        const result = this.camera.takePictureAsync({
+          quality: 0.5,
+          exif: true
+        });
+        this.setState({
+          picture: result.uri,
+          pictureTaken: true
+        });
+      }
+    }
+  };
+  _rejectPhoto = () => {
+    this.setState({
+      picture: null,
+      pictureTaken: false
+    });
+  };
+  _approvePhoto = async () => {
+    const { picture } = this.state;
+    const {
+      navigation: { navigate }
+    } = this.props;
+    const saveResult = await CameraRoll.saveToCameraRoll(picture, "photo");
+    navigate("UploadPhoto", { url: picture });
+    this.setState({
+      picture: null,
+      pictureTaken: false
     });
   };
 }
@@ -128,6 +203,13 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     margin: 10
+  },
+  photoActions: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    flex: 1,
+    alignItems: "center",
+    width: 250
   }
 });
 
